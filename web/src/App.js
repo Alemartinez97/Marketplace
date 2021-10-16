@@ -22,6 +22,7 @@ const ConnectedApp = (props) => {
     app: {
       backgroundColor: "#EEEEEE",
       height: "100vw",
+      overflowY: "scroll",
       [theme.breakpoints.down("xs")]: {
         width: "100vw",
         height: "100vh",

@@ -28,6 +28,7 @@ export default makeStyles((theme) => ({
   poster: {
     width: 680,
     marginBottom: 32,
+    marginLeft: 32,
     [theme.breakpoints.down("xs")]: {
       width: 200,
       marginLeft: 16,
@@ -70,6 +71,6 @@ export default makeStyles((theme) => ({
   },
   button: {
     background: "#3483FA",
-    width: "100%",
+    width: "90%",
   },
 }));

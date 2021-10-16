@@ -39,7 +39,7 @@ export default (props) => {
   };
   return (
     <Container>
-      <Typography className={classes.text}>{items ? "address > adress" : ""}</Typography>
+      <Typography className={classes.text}>{items ? "resultados > resultados" : ""}</Typography>
       {render()}
     </Container>
   );

@@ -32,7 +32,7 @@ export default ({ match }) => {
   return (
     <Container style={{ width: "80%", marginBottom: 32 }}>
       <Typography className={classes.text}>
-        {itemResult ? "address > adress" : ""}{" "}
+        {itemResult ? "Detalle > Detalle" : ""}{" "}
       </Typography>
       <Card>
         <Grid container className={classes.grid}>

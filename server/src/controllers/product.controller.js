@@ -1,15 +1,16 @@
 const axios = require("axios");
 require("dotenv").config();
+const pathMeli = "https://api.mercadolibre.com/";
 var listItems = [];
 var categories = [];
 var itemResp;
 var item;
-
-const orderCategory = async (id_category) => {
-  const body = await axios.get(
-    `https://api.mercadolibre.com/categories/${id_category}`
-  );
-  return categories.push(body.data.name);
+var infoSeller;
+//get nickname
+const getSellerInfo = async (id) => {
+  const body = await axios.get(`${pathMeli}sites/MLA/search?seller_id=${id}`);
+  infoSeller = body.data.seller.nickname;
+  return infoSeller;
 };
 //function that will be in charge of giving order to the json
 const orderItems = async (body) => {
@@ -22,18 +23,20 @@ const orderItems = async (body) => {
       price: {
         currency: e.currency_id,
         amount: e.price,
-        decimals: parseFloat(e.price),
+        decimals: e.price.toFixed(2),
       },
       picture: e.thumbnail,
       condition: e.condition,
       free_shipping: e.shipping.free_shipping,
       address: e.address.state_name,
     };
-    orderCategory(e.category_id);
     if (index < 4) {
       listItems.push(items);
     }
   });
+  await body.data.filters[0].values[0].path_from_root.map((e) =>
+    categories.push(e.name)
+  );
   itemResp = {
     author: {
       name: "String",
@@ -44,11 +47,14 @@ const orderItems = async (body) => {
   };
   return itemResp;
 };
+//order item
 const orderItem = async (body, description) => {
+  await getSellerInfo(body.seller_id);
   item = {
     author: {
-      name: "String",
-      lastname: "String",
+      nick_name: infoSeller,
+      //name: "String",
+      //  lastname: "String",
     },
     item: {
       id: body.id,
@@ -56,7 +62,7 @@ const orderItem = async (body, description) => {
       price: {
         currency: body.currency_id,
         amount: body.base_price,
-        decimals: body.decimals, //consultar duda
+        decimals: body.base_price.toFixed(2),
       },
       picture: body.thumbnail,
       condition: body.condition,
@@ -67,12 +73,11 @@ const orderItem = async (body, description) => {
   };
   return item;
 };
+//get items
 exports.items = async (req, res) => {
   try {
     const { query } = req.query;
-    const body = await axios.get(
-      `https://api.mercadolibre.com/sites/MLA/search?q=:${query}`
-    );
+    const body = await axios.get(`${pathMeli}sites/MLA/search?q=:${query}`);
     await orderItems(body);
     res.status(200).send(itemResp);
   } catch (error) {
@@ -80,14 +85,13 @@ exports.items = async (req, res) => {
     res.status(400).send({ mensaje: "customer error" });
   }
 };
+//get item
 exports.item = async (req, res) => {
   try {
     const id = req.params.id;
-    const body = await axios.get(
-      `https://api.mercadolibre.com/items?ids=${id}`
-    );
+    const body = await axios.get(`${pathMeli}items?ids=${id}`);
     const bodyDescription = await axios.get(
-      `https://api.mercadolibre.com/items?ids=${id}/description`
+      `${pathMeli}items?ids=${id}/description`
     );
     await orderItem(body.data[0].body, bodyDescription.data[0].body.plain_text);
     res.status(200).send(item);
